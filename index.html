@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD с Supabase</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <h1>CRUD операции с Supabase (Пациенты)</h1>
+    
+    <!-- Поиск -->
+    <input type="text" id="searchInput" placeholder="Поиск по ФИО...">
+    
+    <table id="patientsTable">
+        <thead>
+            <tr>
+                <th>ФИО</th>
+                <th>Паспорт</th>
+                <th>Номер Телефона</th>
+                <th>Адрес</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody id="patientsBody">
+            <!-- Данные будут загружаться сюда -->
+        </tbody>
+    </table>
+
+    <h2>Добавить пациента</h2>
+    <form id="addPatientForm">
+        <input type="text" id="name" placeholder="ФИО" required>
+        <input type="text" id="passport" placeholder="Паспорт" required>
+        <input type="text" id="phone" placeholder="Номер телефона" required>
+        <input type="text" id="address" placeholder="Адрес" required>
+        <button type="submit">Добавить</button>
+    </form>
+
+    <script type="module">
+      import { createClient } from "https://esm.sh/@supabase/supabase-js";
+
+      const supabaseUrl = 'https://apzaoluaztouhospymkh.supabase.co';
+      const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwemFvbHVhenRvdWhvc3B5bWtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg2NTc2OTUsImV4cCI6MjA1NDIzMzY5NX0.bZNmYtHlPXJhhnWXapdgm2nIZpxhEcTnACn406iYv28';
+      const supabase = createClient(supabaseUrl, SUPABASE_KEY);
+
+      // DOM элементы
+      const patientsTableBody = document.getElementById('patientsBody');
+      const addPatientForm = document.getElementById('addPatientForm');
+      const searchInput = document.getElementById('searchInput');
+
+      // Массив для хранения всех пациентов
+      let allPatients = [];
+
+      // Функция для получения пациентов
+      async function getPatients() {
+          const { data, error } = await supabase.from('Patient').select();
+          if (error) {
+              console.error('Ошибка получения данных:', error.message);
+              return;
+          }
+          console.log('Данные пациентов:', data); // Выводим данные в консоль для проверки
+          allPatients = data;  // Сохраняем все данные пациентов
+          renderPatients(allPatients);  // Отображаем всех пациентов
+      }
+
+      // Функция для отображения пациентов в таблице
+      function renderPatients(patients) {
+          patientsTableBody.innerHTML = ''; // Очистка таблицы
+          patients.forEach(patient => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                  <td>${patient.ФИО}</td>
+                  <td>${patient.Паспорт}</td>
+                  <td>${patient.Номер_тел}</td>
+                  <td>${patient.Адрес}</td>
+                  <td>
+                      <button class="edit-btn" data-id="${patient.Пациент_id}">Изменить</button>
+                      <button class="delete-btn" data-id="${patient.Пациент_id}">Удалить</button>
+                  </td>
+              `;
+              patientsTableBody.appendChild(row);
+          });
+
+          // Привязываем события для кнопок "Изменить" и "Удалить"
+          document.querySelectorAll('.edit-btn').forEach(button => {
+              button.addEventListener('click', (e) => {
+                  const id = e.target.getAttribute('data-id');
+                  editPatient(id);
+              });
+          });
+
+          document.querySelectorAll('.delete-btn').forEach(button => {
+              button.addEventListener('click', (e) => {
+                  const id = e.target.getAttribute('data-id');
+                  deletePatient(id);
+              });
+          });
+      }
+
+      // Функция для поиска пациентов по ФИО
+      function searchPatients() {
+          const searchTerm = searchInput.value.toLowerCase();
+
+          // Фильтрация всех пациентов, имена которых содержат строку поиска
+          const filteredPatients = allPatients.filter(patient =>
+              patient.ФИО.toLowerCase().includes(searchTerm)
+          );
+
+          // Отображаем отфильтрованных пациентов
+          renderPatients(filteredPatients);
+      }
+
+      // Привязываем функцию поиска к полю ввода
+      searchInput.addEventListener('input', searchPatients);
+
+      addPatientForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('name').value;
+        const passport = document.getElementById('passport').value;
+        const phone = document.getElementById('phone').value;
+        const address = document.getElementById('address').value;
+
+        const { data, error } = await supabase
+            .from('Patient')
+            .insert([{ ФИО: name, Паспорт: passport, Номер_тел: phone, Адрес: address }]);
+
+        if (error) {
+            console.error('Ошибка добавления пациента:', error.message);
+        } else {
+            getPatients(); // Перезагружаем список
+            // Очищаем поля формы после добавления пациента
+            document.getElementById('name').value = '';
+            document.getElementById('passport').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('address').value = '';
+        }
+      });
+
+      // Функция для удаления пациента
+      async function deletePatient(id) {
+          const { error } = await supabase.from('Patient').delete().match({ Пациент_id: id });
+          if (error) {
+              console.error('Ошибка удаления пациента:', error.message);
+          } else {
+              getPatients(); // Перезагружаем список
+          }
+      }
+
+      // Функция для редактирования пациента
+      async function editPatient(id) {
+          const name = prompt('Введите новое ФИО:');
+          const passport = prompt('Введите новый паспорт:');
+          const phone = prompt('Введите новый номер телефона:');
+          const address = prompt('Введите новый адрес:');
+
+          const { error } = await supabase
+              .from('Patient')
+              .update({ ФИО: name, Паспорт: passport, Номер_тел: phone, Адрес: address })
+              .match({ Пациент_id: id });
+
+          if (error) {
+              console.error('Ошибка редактирования пациента:', error.message);
+          } else {
+              getPatients(); // Перезагружаем список
+          }
+      }
+
+      // Инициализация
+      getPatients();
+    </script>
+</body>
+</html>

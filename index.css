@@ -1,0 +1,144 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #fdf4e3, #ff9b85);
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Изменено, чтобы контент не сжимался */
+    align-items: center;
+    min-height: 100vh; /* Вместо фиксированной высоты */
+    box-sizing: border-box;
+    overflow-x: hidden; /* Убирает горизонтальный скролл */
+}
+
+/* Заголовок */
+h1 {
+    text-align: center;
+    font-size: 36px; /* Сделал чуть меньше для адаптивности */
+    color: #ff6f61;
+    margin-bottom: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1s ease-out;
+}
+
+/* Контейнер для формы и таблицы */
+.container {
+    width: 90%;
+    max-width: 900px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* Поля ввода */
+input[type="text"], input[type="email"], input[type="number"] {
+    width: calc(100% - 20px);
+    margin: 10px 0;
+    padding: 14px;
+    font-size: 16px;
+    border: none;
+    border-radius: 25px;
+    background: #ffe1c4; /* Персиковый */
+    box-sizing: border-box;
+    color: #333;
+    transition: 0.3s ease;
+    text-align: center;
+}
+
+/* Эффект при фокусе */
+input[type="text"]:focus, input[type="email"]:focus, input[type="number"]:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(255, 111, 97, 0.5);
+}
+
+/* Кнопки */
+button {
+    padding: 12px 24px;
+    font-size: 16px;
+    background-color: #ff6f61;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Анимация */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стили для таблицы */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Заголовки таблицы */
+th {
+    background-color: #ffecd9;
+    color: #ff6f61;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 12px;
+}
+
+/* Ячейки таблицы */
+td {
+    padding: 10px;
+    text-align: left;
+}
+
+/* Кнопки в таблице */
+td button {
+    padding: 6px 12px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 28px;
+    }
+    .container {
+        padding: 15px;
+    }
+    input[type="text"], input[type="email"], input[type="number"] {
+        padding: 12px;
+        font-size: 14px;
+    }
+    button {
+        padding: 10px 20px;
+    }
+}
